@@ -6,7 +6,7 @@ from models.blip_kind import BlipKind
 @dataclass(frozen=True)
 class Blip:
     kind: BlipKind
-    val: any
+    val: str
 
     def __str__(self):
         if self.kind == BlipKind.WORD:
@@ -15,3 +15,7 @@ class Blip:
             return "👏"
         elif self.kind == BlipKind.SNAP:
             return "🫰"
+
+    @staticmethod
+    def word(val: str) -> "Blip":
+        return Blip(BlipKind.WORD, val)
