@@ -8,6 +8,11 @@ class Blip:
     kind: BlipKind
     val: str
 
+    def __bool__(self):
+        if self.kind == BlipKind.WORD:
+            return bool(self.val)
+        return True
+
     def __str__(self):
         if self.kind == BlipKind.WORD:
             return self.val

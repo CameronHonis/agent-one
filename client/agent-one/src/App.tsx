@@ -2,24 +2,17 @@ import React from "react"
 
 function App() {
     React.useEffect(() => {
-        // Set up SSE connection for server-to-client messages
-        const eventSource = new EventSource('http://localhost:8080/api/events/1');
+        const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+        recognition.lang = 'en-US';
+        recognition.continuous = false;
+        recognition.interimResults = false;
 
-        // Listen for server requests
-        eventSource.addEventListener('message', async (event) => {
-            const request = JSON.parse(event.data);
+        recognition.onresult = (event) => {
+            const transcript = event.results[0][0].transcript;
+            console.log(`You said: ${transcript}`);
+        };
 
-            if (request.type === 'screenCapture') {
-                // Capture screen and send back
-                console.log("requesting screen access placeholder");
-                // Send response back to server
-                await fetch('/api/response', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ id: request.id, data: "screen data placeholder" })
-                });
-            }
-        });
+        recognition.start();
     });
 }
 

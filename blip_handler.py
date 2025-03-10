@@ -1,12 +1,13 @@
-# pylint: disable=missing-docstring
-# pylint: disable=fixme
 from enum import Enum
 import logging
 from collections import deque
-from langchain_core.language_models.chat_models import BaseChatModel
+import typing
 
 from models.blip import Blip
 from models.blip_kind import BlipKind
+
+if typing.TYPE_CHECKING:
+    from main import Agent
 
 logger = logging.getLogger(__name__)
 
@@ -17,21 +18,26 @@ class BlipHandlerState(Enum):
 
 
 class BlipHandler:
-    def __init__(self, model: BaseChatModel):
-        self._model = model
+    def __init__(self):
         self._mem = deque()
         self._state = BlipHandlerState.PASSIVE
 
-    def handle(self, blip: Blip):
+    def handle(self, blip: Blip, agent: "Agent"):
+        if not blip:
+            return
+        blip = BlipHandler._filter_blip(blip)
         logger.debug("heard %s", str(blip))
+
         if blip.kind != BlipKind.WORD:
             logger.debug("not handling non verbals at the moment")
 
         self._mem.append(blip)
+        logger.info("mem cache: %s", self._concat_mem())
+
         if self._state == BlipHandlerState.PASSIVE:
             self._passive_handle()
         else:
-            self._active_handle()
+            self._active_handle(agent)
 
     def _match_last_words(self, *words) -> bool:
         words = list(words)
@@ -49,27 +55,42 @@ class BlipHandler:
         return " ".join([blip.val for blip in self._mem])
 
     def _passive_handle(self):
-        if (
-            len(self._mem) >= 2
-            and self._mem[-2].val == "hey"
-            and self._mem[-1] == "agent"
-        ):
-            logger.debug("actively listening")
+        if self._match_last_words("hey", "agent"):
             self._state = BlipHandlerState.ACTIVE
+            logger.info("actively listening")
             self._mem.clear()
 
-    def _active_handle(self):
-        if len(self._mem) and self._mem[-1] == "go":
+    def _active_handle(self, agent: "Agent"):
+        if self._match_last_words("go"):
             prompt = self._concat_mem()
-            self._model.invoke(prompt)
+            agent.prompt(prompt)
             self._mem.clear()
             # TODO: handle case when model responds with follow-up question
             self._state = BlipHandlerState.PASSIVE
+            logger.info("passively listening")
+
+    @staticmethod
+    def _filter_blip(blip: Blip) -> Blip:
+        if blip.kind == BlipKind.WORD:
+            builder = []
+            for char in blip.val:
+                if char.isalnum():
+                    builder.append(char.lower())
+            return Blip.word("".join(builder))
+        return blip
 
 
-def test_blip_handler_match_last_words():
+def _test_blip_handler_filter_blips():
     # pylint: disable=W0212
-    bh = BlipHandler(None)
+    assert BlipHandler._filter_blip(Blip.word("Hello")).val == "hello"
+    assert BlipHandler._filter_blip(Blip.word("Hello!")).val == "hello"
+    assert BlipHandler._filter_blip(Blip.word("asdf 123")).val == "asdf123"
+    # pylint: enable=all
+
+
+def _test_blip_handler_match_last_words():
+    # pylint: disable=W0212
+    bh = BlipHandler()
     bh._mem.append(Blip.word("first"))
     bh._mem.append(Blip.word("second"))
     bh._mem.append(Blip.word("third"))
@@ -91,5 +112,6 @@ def test_blip_handler_match_last_words():
 
 
 if __name__ == "__main__":
-    test_blip_handler_match_last_words()
+    _test_blip_handler_filter_blips()
+    _test_blip_handler_match_last_words()
     print("tests passed")
