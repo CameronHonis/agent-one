@@ -145,6 +145,8 @@ wcwidth = "0.2.13"
 websockets = "15.0"
 yarl = "1.18.3"
 zstandard = "0.23.0"
+vosk = "^0.3.45"
+sounddevice = "^0.5.1"
 
 
 [build-system]
