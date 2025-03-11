@@ -2,23 +2,14 @@ from collections.abc import Callable
 from enum import Enum
 import logging
 from multiprocessing import Process, Queue
-import os
-import sys
 import speech_recognition as sr
 
 from models.blip import Blip
 from models.blip_kind import BlipKind
 from models.ears import Ears
+from models.recognizer_name import RecognizerName
 
 logger = logging.getLogger(__name__)
-
-
-class RecognizerName(Enum):
-    WHISPER_BASE_OFFLINE = "whisper_base_offline"
-    WHISPER_SMALL_OFFLINE = "whisper_small_offline"
-    WHISPER_MEDIUM_OFFLINE = "whisper_medium_offline"
-    WHISPER_LARGE_OFFLINE = "whisper_large_offline"
-    GOOGLE = "google"
 
 
 class BasicEars(Ears):
