@@ -7,6 +7,9 @@ from modded_deps.modded_recognizer import ModdedRecognizer
 from models.ears import Ears
 from models.recognizer_name import RecognizerName
 
+PAUSE_THRESHOLD = 1.6
+NON_SPEAKING_DURATION = 1
+
 logger = logging.getLogger(__name__)
 
 
@@ -96,6 +99,9 @@ class StatefulEars(Ears):
 
     def _on_phrase_start(self):
         logger.debug("voice started")
+
+    def _on_phrase_end(self, audio_data: sr.AudioData):
+        pass
 
 
 if __name__ == "__main__":
