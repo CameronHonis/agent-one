@@ -76,6 +76,7 @@ class VoskStreamedEars(Ears):
         logger.debug(
             "listening for words: rate=%s, blocksize=%s", AUDIO_SAMPLE_RATE, blocksize
         )
+        logger.info("say '%s' to get the agent's attention", TRIGGER)
         import sounddevice as sd
 
         with sd.RawInputStream(
@@ -144,7 +145,7 @@ class VoskStreamedEars(Ears):
         """
         handles words that have not yet been finalized by the transcriber
         """
-        logger.debug("partial: %s", words)
+        logger.info("partial: %s", words)
         with self._lock:
             self._shared_last_audio_time.value = time.time()
             is_passive = self._shared_listening_mode.value == ListeningMode.PASSIVE
@@ -156,7 +157,7 @@ class VoskStreamedEars(Ears):
         """
         handles words that have been finalized by the transcriber
         """
-        logger.debug("heard: %s", words)
+        logger.info("heard: %s", words)
 
         with self._lock:
             self._shared_words.append(words)
@@ -210,7 +211,7 @@ class VoskStreamedEars(Ears):
 
             self._shared_words[:] = []
             self._shared_listening_mode.value = ListeningMode.PASSIVE
-            logger.debug("passively listening...")
+            logger.info("passively listening...")
             return True
 
 
