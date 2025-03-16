@@ -219,5 +219,5 @@ if __name__ == "__main__":
     logging.basicConfig(
         level=logging.DEBUG,
     )
-    ears = VoskStreamedEars("/home/camer/Downloads/vosk-model-en-us-0.22")
+    ears = VoskStreamedEars("models/vosk-model-en-us-0.22")
     ears.listen().join()
