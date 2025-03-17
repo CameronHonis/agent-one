@@ -1,10 +1,8 @@
 from enum import Enum
 import json
 import logging
-import math
 import multiprocessing as mp
 import time
-from typing import override
 
 from models.ears import Ears
 

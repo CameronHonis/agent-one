@@ -1,19 +1,16 @@
 [tool.poetry]
-name = "agent"
+name = "tts-server"
 version = "0.1.0"
 description = ""
 authors = ["cameron <cameron-04@hotmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.12"
+python = ">=3.10,<3.12"
+tts = "^0.22.0"
 sounddevice = "^0.5.1"
 ipykernel = "^6.29.5"
-langchain = "^0.3.20"
-langchain-anthropic = "^0.3.10"
-langchain-community = "^0.3.19"
-langchain-core = "^0.3.45"
-vosk = "^0.3.45"
+pyaudio = "^0.2.14"
 
 
 [build-system]
